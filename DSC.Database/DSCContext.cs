@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DSC.Database.Domain;
+using Microsoft.EntityFrameworkCore;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace DSC.WebApi.Models
+namespace DSC.Database
 {
     public class DSCContext : DbContext
     {

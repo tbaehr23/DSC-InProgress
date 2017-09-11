@@ -1,4 +1,5 @@
-﻿using DSC.WebApi.Models;
+﻿using DSC.Database;
+using DSC.WebApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,8 @@ namespace DSC.WebApi
         {
             // Add framework services.
             services.AddDbContext<DSCContext>(opt => opt.UseInMemoryDatabase());
+            services.AddScoped<IJobRepository, JobRepository>();
+
             services.AddMvc();
         }
 

@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DSC.Database.Domain;
 using DSC.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 // ReSharper disable InconsistentNaming
 // ReSharper disable CheckNamespace
 
-namespace DSC.WebApi.Test.JobController
+namespace DSC.WebApi.Test.Job_Controller
 {
+    [Collection("DSC")]
     public class When_Get_without_parameter_executes
     {
         private readonly IActionResult _result;
@@ -17,7 +19,7 @@ namespace DSC.WebApi.Test.JobController
         {
             using (var context = DSCContextFactory.InMemoryContext())
             {
-                var controller = new Controllers.JobController(context);
+                var controller = new Controllers.JobController(new JobRepository(context));
 
                 _result = controller.Get();
 
@@ -39,7 +41,8 @@ namespace DSC.WebApi.Test.JobController
 
             Assert.All(_jobs, j => Assert.IsType<Job>(j));
 
-            Assert.True(_jobs.Count() == 2, "There are not 2 jobs");
+            var seedDataCount = SeedData.Jobs().Count();
+            Assert.True(_jobs.Count() == seedDataCount, "There are not" + seedDataCount + "jobs");
         }
     }
 }

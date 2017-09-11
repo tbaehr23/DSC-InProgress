@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DSC.Database.Domain;
 using DSC.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,27 +10,19 @@ namespace DSC.WebApi.Controllers
     [Route("api/[controller]")]
     public class JobController : Controller
     {
-        private DSCContext _context;
+        private IJobRepository _repository;
 
-        public JobController(DSCContext context)
+        public JobController(IJobRepository repository)
         {
-            _context = context;
+            _repository = repository;
 
-            if (!_context.Jobs.Any())
-            {
-                _context.Jobs.AddRange(
-                    new Job {Name = "Job1", IsCompleted = false},
-                    new Job {Name = "Job2", IsCompleted = true}
-                );
-                _context.SaveChanges();
-            }
-        }
+       }
 
         // GET: api/values
         [HttpGet]
         public IActionResult Get()
         {
-            var items = _context.Jobs;
+            var items = _repository.GetList();
             if (!items.Any())
             {
                 return NotFound();
@@ -42,7 +35,7 @@ namespace DSC.WebApi.Controllers
         [HttpGet("{id}", Name = "GetJob")]
         public IActionResult Get(int id)
         {
-            var item = _context.Find<Job>(id);
+            var item = _repository.GetById(id);
             if (item == null)
             {
                 return NotFound();
@@ -59,9 +52,8 @@ namespace DSC.WebApi.Controllers
                 return BadRequest();
             }
 
-            _context.Add(item);
-            _context.SaveChanges();
-
+            _repository.Save(item);
+           
             return CreatedAtRoute(routeName: "GetJob", routeValues: new { id = item.Id }, value: item);
         }
 
@@ -74,35 +66,31 @@ namespace DSC.WebApi.Controllers
                 return BadRequest();
             }
 
-            var existingJob = _context.Find<Job>(id);
+            var existingJob = _repository.GetById(id);
 
             if (existingJob == null)
             {
                 return NotFound();
             }
 
-            existingJob.Name = item.Name;
-            existingJob.IsCompleted = item.IsCompleted;
-
-            _context.Update(existingJob);
-            _context.SaveChanges();
-
+            _repository.Save(item);
+  
             return new NoContentResult();
         }
+
         // DELETE api/values/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existingJob = _context.Find<Job>(id);
+            var existingJob = _repository.GetById(id);
 
             if (existingJob == null)
             {
                 return NotFound();
             }
 
-            _context.Remove(existingJob);
-            _context.SaveChanges();
-
+            _repository.Delete(_repository.GetById(id));
+           
             return new NoContentResult();
         }
     }
